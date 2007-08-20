@@ -221,8 +221,8 @@ static void detect_collisions(struct state *state)
 		if (enemy->used
 		    && enemy->x == state->x
 		    && enemy->y == state->y) {
-				state->hits++;
-				enemy->used = FALSE;
+			state->hits++;
+			enemy->used = FALSE;
 		}
 	}
 }
