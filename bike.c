@@ -49,7 +49,7 @@ struct state {
 	struct timeval start_time;
 };
 
-static void title_screen();
+static void title_screen(void);
 static void game_over_screen(struct state *state);
 static void init_enemy(struct enemy *enemy, bool init);
 static void draw_enemy(struct enemy *enemy);
@@ -118,7 +118,7 @@ int main(void)
 	return 0;
 }
 
-static void title_screen()
+static void title_screen(void)
 {
 	int line = (((LINES)/2) - 5);
 	erase();
