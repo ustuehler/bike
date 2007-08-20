@@ -1,7 +1,7 @@
 /*
  * bike - Ride your bike down the hill.
  *
- * Copyright (C) 2007 Stefan Sperling <stsp@stsp,name>
+ * Copyright (C) 2007 Stefan Sperling <stsp@stsp.name>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
