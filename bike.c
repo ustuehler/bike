@@ -24,7 +24,10 @@
 
 #define NUM_ENEMIES	400	/* number of enemies. */
 #define MAX_HITS	5	/* game is over when MAX_HITS is reached */
-#define EDGE		20	/* width of edge of screen */
+#define PATH_WIDTH	30	/* width of bike path */
+#define PATH_LENGTH	25	/* length of bike path */
+#define SIDE_EDGE	((COLS - PATH_WIDTH) / 2)
+#define TOP_EDGE	(LINES - PATH_LENGTH)
 #define BIKE_CHAR	'8'	/* the char the represents the bike */
 
 struct enemy {
@@ -62,7 +65,7 @@ static void new_enemies(struct state *state, bool init);
 static void advance_enemies(struct state *state);
 static void draw_bike(struct state *state);
 static void draw_status_bar(struct state *state);
-static void draw_edge();
+static void draw_path(void);
 static void cleanup(void);
 static void message(int y, int x, const char *fmt, ...);
 static void wait_for_key(int key);
@@ -188,11 +191,11 @@ static void get_input(struct state* state)
 			state->done = TRUE;
 			break;
 		case KEY_LEFT:
-			if (state->x > EDGE + 1)
+			if (state->x > SIDE_EDGE + 1)
 				state->x--;
 			break;
 		case KEY_RIGHT:
-			if (state->x < COLS - 1 - EDGE)
+			if (state->x < COLS - 1 - SIDE_EDGE)
 				state->x++;
 			break;
 		default:
@@ -203,7 +206,7 @@ static void get_input(struct state* state)
 static void advance_game(struct state* state)
 {
 	erase();
-	draw_edge();
+	draw_path();
 	new_enemies(state, FALSE);
 	advance_enemies(state);
 	draw_enemies(state);
@@ -284,15 +287,11 @@ static void new_enemies(struct state *state, bool init)
 static void init_enemy(struct enemy *enemy, bool init)
 {
 	enemy->used = TRUE;
-	enemy->x = random() % COLS;
-	if (enemy->x < EDGE + 1)
-		enemy->x += EDGE + 1;
-	else if (enemy->x > COLS - 1 - EDGE)
-		enemy->x -= EDGE;
+	enemy->x = (random() % (PATH_WIDTH - 1)) + SIDE_EDGE + 1;
 	if (init)
-		enemy->y = random() % (LINES - 10);
+		enemy->y = (random() % (PATH_LENGTH / 2)) + TOP_EDGE;
 	else
-		enemy->y = 0;
+		enemy->y = TOP_EDGE;
 	enemy->c = enemy_chars[random() % (strlen(enemy_chars))];
 }
 
@@ -318,11 +317,11 @@ static void cleanup(void)
 	(void)endwin();
 }
 
-static void draw_edge()
+static void draw_path()
 {
 	int line;
-	for (line = 0; line < LINES - 1; line++) {
-		mvaddch(line, EDGE, '|');
-		mvaddch(line, COLS - EDGE, '|');
+	for (line = TOP_EDGE; line < LINES - 1; line++) {
+		mvaddch(line, SIDE_EDGE, '|');
+		mvaddch(line, COLS - SIDE_EDGE, '|');
 	}
 }
