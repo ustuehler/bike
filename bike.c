@@ -83,7 +83,7 @@ int main(void)
 	leaveok(stdscr, TRUE);
 	nodelay(stdscr, TRUE);
 	atexit(cleanup);
-	
+
 	title_screen();
 
 	init_state(&state);
@@ -280,7 +280,7 @@ static void new_enemies(struct state *state, bool init)
 		}
 	}
 }
-	
+
 static void init_enemy(struct enemy *enemy, bool init)
 {
 	enemy->used = TRUE;
