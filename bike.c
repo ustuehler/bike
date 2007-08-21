@@ -22,6 +22,7 @@
 #include <string.h>
 #include <sys/time.h>
 
+#define VERSION		"1.0"
 #define NUM_ENEMIES	400	/* number of enemies. */
 #define MAX_HITS	5	/* game is over when MAX_HITS is reached */
 #define PATH_WIDTH	30	/* width of bike path */
@@ -125,7 +126,7 @@ static void title_screen(void)
 {
 	int line = (((LINES)/2) - 5);
 	erase();
-	message(line, (COLS/2) - 5, " << BIKE >>");
+	message(line, (COLS/2) - 7, " << BIKE %s >>", VERSION);
 	message(line + 2, (COLS/2) - 24,
 		"Objective: Ride your bike down the hill without");
 	message(line + 3, (COLS/2) - 15,
@@ -133,11 +134,13 @@ static void title_screen(void)
 	message(line + 4, (COLS/2) - 24 ,
 		"Your bike is the little '%c' at the bottom of the screen.",
 		BIKE_CHAR);
-	message(line + 5, (COLS/2) - 14, "Hit the space bar to begin!");
-	message(line + 6, (COLS/2) - 12,
-		"Use arrow keys to move.");
-	message(line + 7, (COLS/2) - 17,
-		"Press q to quit while in the game.");
+	message(line + 5, (COLS/2) - 25,
+		"Use the left arrow key, or 'j', or 'h' to move left.");
+	message(line + 6, (COLS/2) - 26,
+		"Use the right arrow key, or 'k', or 'l' to move right.");
+	message(line + 7, (COLS/2) - 14, "Hit the space bar to begin!");
+	message(line + 8, (COLS/2) - 17,
+		"Press 'q' to quit while in the game.");
 	refresh();
 	wait_for_key(' ');
 }
@@ -191,10 +194,14 @@ static void get_input(struct state* state)
 			state->done = TRUE;
 			break;
 		case KEY_LEFT:
+		case 'j':
+		case 'h':
 			if (state->x > SIDE_EDGE + 1)
 				state->x--;
 			break;
 		case KEY_RIGHT:
+		case 'k':
+		case 'l':
 			if (state->x < COLS - 1 - SIDE_EDGE)
 				state->x++;
 			break;
