@@ -54,7 +54,7 @@ struct state {
 };
 
 static void title_screen(void);
-static void game_over_screen(struct state *state);
+static void game_over(struct state *state);
 static void init_enemy(struct enemy *enemy, bool init);
 static void draw_enemy(struct enemy *enemy);
 static void get_input(struct state *state);
@@ -115,8 +115,10 @@ int main(void)
 			state.done = TRUE;
 	}
 
+	endwin();
+
 	if (state.hits >= MAX_HITS)
-		game_over_screen(&state);
+		game_over(&state);
 	/* else user pressed 'q' to quit. */
 
 	return 0;
@@ -145,19 +147,14 @@ static void title_screen(void)
 	wait_for_key(' ');
 }
 
-static void game_over_screen(struct state *state)
+static void game_over(struct state *state)
 {
 	struct timeval now = {0L, 0L};
 	struct timeval res = {0L, 0L};
 
 	(void)gettimeofday(&now, NULL);
 	timersub(&now, &state->start_time, &res);
-
-	erase();
-	message(LINES/2, (COLS/2) - 5, "GAME OVER");
-	message(LINES/2 + 2, (COLS/2) - 12,
-		"You lasted %i seconds.", res.tv_sec);
-	refresh();
+	printf("GAME OVER -- You lasted %lu seconds.\n", res.tv_sec);
 }
 
 static void wait_for_key(int key)
@@ -321,7 +318,8 @@ static void draw_status_bar(struct state* state)
 
 static void cleanup(void)
 {
-	(void)endwin();
+	if (!isendwin())
+		(void)endwin();
 }
 
 static void draw_path()
