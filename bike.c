@@ -87,6 +87,7 @@ int main(void)
 	leaveok(stdscr, TRUE);
 	nodelay(stdscr, TRUE);
 	atexit(cleanup);
+	curs_set(0);
 
 	title_screen();
 
@@ -320,6 +321,7 @@ static void cleanup(void)
 {
 	if (!isendwin())
 		(void)endwin();
+	curs_set(1);
 }
 
 static void draw_path()
