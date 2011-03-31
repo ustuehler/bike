@@ -243,7 +243,6 @@ static void message(int y, int x, const char *fmt, ...)
 	memset(msg, 0, sizeof(msg));
 
 	move(y, x);
-	clrtoeol();
 	va_start(ap, fmt);
 	vsnprintf(msg, sizeof(msg), fmt, ap);
 	va_end(ap);
@@ -313,7 +312,10 @@ static void draw_bike(struct state *state)
 
 static void draw_status_bar(struct state* state)
 {
+	int i;
 	attron(A_STANDOUT);
+	for (i = 0; i < (MAX_HITS - state->hits); i++) 
+		message(LINES - 3 - (i<<1), 3, "%c", BIKE_CHAR);
 	message(LINES - 1, 0, "Pos: %.2i - Hits: %i", state->x, state->hits);
 	attroff(A_STANDOUT);
 }
