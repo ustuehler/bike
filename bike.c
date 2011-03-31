@@ -281,7 +281,7 @@ static void new_enemies(struct state *state, bool init)
 
 	for (i = 0; i < NUM_ENEMIES; i++) {
 		struct enemy *enemy = &state->enemies[i];
-		if ((! enemy->used) && ((random() % 103) == 0)) {
+		if ((!enemy->used) && ((random() % 103) == 0)) {
 			init_enemy(enemy, init);
 			if (!init)
 				break;
