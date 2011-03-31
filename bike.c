@@ -31,7 +31,7 @@
 #define SIDE_EDGE	((COLS - PATH_WIDTH) / 2)
 #define TOP_EDGE	(LINES - PATH_LENGTH)
 #define BIKE_CHAR	'8'	/* the char the represents the bike */
-#define DELAY_USEC	80000L
+#define DELAY_USEC	50000L
 
 struct enemy {
 	bool used;
