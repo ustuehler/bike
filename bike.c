@@ -31,6 +31,7 @@
 #define SIDE_EDGE	((COLS - PATH_WIDTH) / 2)
 #define TOP_EDGE	(LINES - PATH_LENGTH)
 #define BIKE_CHAR	'8'	/* the char the represents the bike */
+#define DELAY_USEC	80000L
 
 struct enemy {
 	bool used;
@@ -46,7 +47,6 @@ struct state {
 	int x;
 	int y;
 	int bike;
-	int delay;
 	int steps;
 	int speed;
 	int hits;
@@ -106,12 +106,11 @@ int main(void)
 		advance_game(&state);
 
 		timersub(&now, &last_time, &res);
-		if (res.tv_usec > state.delay)
-			usleep(state.delay);
-		else
-			usleep(res.tv_usec);
-		last_time.tv_sec = now.tv_sec;
-		last_time.tv_usec = now.tv_usec;
+
+		if (res.tv_sec == 0 && res.tv_usec < DELAY_USEC)
+			usleep(DELAY_USEC - res.tv_usec);
+
+		last_time = now;
 
 		if (state.hits >= MAX_HITS)
 			state.done = TRUE;
@@ -179,7 +178,6 @@ static void init_state(struct state *state)
 	state->x = COLS / 2;
 	state->y = LINES - 2;
 	state->bike = BIKE_CHAR;
-	state->delay = 30000;
 	state->steps = 0;
 	state->speed = 5;
 	(void)gettimeofday(&state->start_time, NULL);
