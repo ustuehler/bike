@@ -23,7 +23,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#define VERSION		"1.0"
+#define VERSION		"1.1"
 #define NUM_ENEMIES	400	/* number of enemies. */
 #define MAX_HITS	5	/* game is over when MAX_HITS is reached */
 #define PATH_WIDTH	30	/* width of bike path */
