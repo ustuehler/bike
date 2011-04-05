@@ -41,12 +41,15 @@ struct enemy {
 	short color;
 };
 
+struct bike {
+	int x;
+	int y;
+	int hits;
+};
+
 static int done;
-static int x;
-static int y;
 static int steps;
 static int slowness;
-static int hits;
 static struct enemy enemies[NUM_ENEMIES];
 static struct timeval start_time;
 static bool use_colors;
@@ -76,15 +79,15 @@ static void title_screen(void);
 static void game_over(void);
 static void init_enemy(bool, struct enemy *);
 static void draw_enemy(struct enemy *);
-static void get_input(void);
-static void advance_game(void);
-static void detect_collisions(void);
-static void init_state(void);
+static void get_input(struct bike *);
+static void advance_game(struct bike *);
+static void detect_collisions(struct bike *);
+static void init_state(struct bike *);
 static void draw_enemies(void);
 static void new_enemies(bool);
 static void advance_enemies(void);
-static void draw_bike(void);
-static void draw_status_bar(void);
+static void draw_bike(struct bike *);
+static void draw_status_bar(struct bike *);
 static void draw_path(void);
 static void cleanup(void);
 static void message(int, int, const char *, ...);
@@ -92,6 +95,7 @@ static void wait_for_key(int);
 
 int main(void)
 {
+	struct bike bike;
 	struct timeval last_time = {0L, 0L};
 	struct timeval now = {0L, 0L};
 	struct timeval res = {0L, 0L};
@@ -109,13 +113,13 @@ int main(void)
 
 	title_screen();
 
-	init_state();
+	init_state(&bike);
 	if (use_colors) {
 		color_set(COLOR_DEFAULT, NULL);
 		clear();
 	}
 	new_enemies(TRUE);
-	advance_game();
+	advance_game(&bike);
 
 	(void)gettimeofday(&last_time, NULL);
 	srandom(last_time.tv_sec);
@@ -123,8 +127,8 @@ int main(void)
 	while (!done) {
 		(void)gettimeofday(&now, NULL);
 
-		get_input();
-		advance_game();
+		get_input(&bike);
+		advance_game(&bike);
 
 		timersub(&now, &last_time, &res);
 
@@ -138,13 +142,13 @@ int main(void)
 
 		last_time = now;
 
-		if (hits >= MAX_HITS)
+		if (bike.hits >= MAX_HITS)
 			done = TRUE;
 	}
 
 	endwin();
 
-	if (hits >= MAX_HITS)
+	if (bike.hits >= MAX_HITS)
 		game_over();
 	/* else user pressed 'q' to quit. */
 
@@ -198,14 +202,16 @@ static void wait_for_key(int key)
 	nodelay(stdscr, TRUE);
 }
 
-static void init_state(void)
+static void init_state(struct bike *bike)
 {
 	int i;
 
-	x = COLS / 2;
-	y = LINES - 2;
+	bike->x = COLS / 2;
+	bike->y = LINES - 2;
+	bike->hits = 0;
 	steps = 0;
 	slowness = 5;
+	done = FALSE;
 	use_colors = (has_colors() && (start_color() != ERR));
 	if (use_colors) {
 		for (i = 0; i < sizeof(colors); i++)
@@ -214,7 +220,7 @@ static void init_state(void)
 	(void)gettimeofday(&start_time, NULL);
 }
 
-static void get_input(void)
+static void get_input(struct bike *bike)
 {
 	int c = getch();
 	switch (c) {
@@ -224,40 +230,40 @@ static void get_input(void)
 		case KEY_LEFT:
 		case 'j':
 		case 'h':
-			if (x > SIDE_EDGE + 1)
-				x--;
+			if (bike->x > SIDE_EDGE + 1)
+				bike->x--;
 			break;
 		case KEY_RIGHT:
 		case 'k':
 		case 'l':
-			if (x < COLS - 1 - SIDE_EDGE)
-				x++;
+			if (bike->x < COLS - 1 - SIDE_EDGE)
+				bike->x++;
 			break;
 		default:
 			break;
 	}
 }
 
-static void advance_game(void)
+static void advance_game(struct bike *bike)
 {
 	erase();
 	draw_path();
 	new_enemies(FALSE);
 	advance_enemies();
 	draw_enemies();
-	draw_bike();
-	detect_collisions();
-	draw_status_bar();
+	draw_bike(bike);
+	detect_collisions(bike);
+	draw_status_bar(bike);
 	refresh();
 }
 
-static void detect_collisions()
+static void detect_collisions(struct bike *bike)
 {
 	int i;
 	for (i = 0; i < NUM_ENEMIES; i++) {
 		struct enemy *enemy = &enemies[i];
-		if (enemy->used && enemy->x == x && enemy->y == y) {
-			hits++;
+		if (enemy->used && enemy->x == bike->x && enemy->y == bike->y) {
+			bike->hits++;
 			enemy->used = FALSE;
 		}
 	}
@@ -353,16 +359,16 @@ static void draw_enemy(struct enemy *enemy)
 		color_set(COLOR_DEFAULT, NULL);
 }
 
-static void draw_bike(void)
+static void draw_bike(struct bike *bike)
 {
 	if (use_colors)
 		color_set(COLOR_BIKE, NULL);
-	mvaddch(y, x, BIKE_CHAR);
+	mvaddch(bike->y, bike->x, BIKE_CHAR);
 	if (use_colors)
 		color_set(COLOR_DEFAULT, NULL);
 }
 
-static void draw_status_bar(void)
+static void draw_status_bar(struct bike *bike)
 {
 	int i;
 
@@ -370,9 +376,9 @@ static void draw_status_bar(void)
 		color_set(COLOR_STATUS, NULL);
 	else
 		attron(A_STANDOUT);
-	for (i = 0; i < (MAX_HITS - hits); i++) 
+	for (i = 0; i < (MAX_HITS - bike->hits); i++) 
 		message(LINES - 3 - (i << 1), 3, "%c", BIKE_CHAR);
-	message(LINES - 1, 0, "Pos: %.2i - Hits: %i", x, hits);
+	message(LINES - 1, 0, "Pos: %.2i - Hits: %i", bike->x, bike->hits);
 	if (use_colors)
 		color_set(COLOR_DEFAULT, NULL);
 	else
