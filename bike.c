@@ -46,7 +46,7 @@ struct state {
 	int x;
 	int y;
 	int steps;
-	int speed;
+	int slowness;
 	int hits;
 	struct enemy enemies[NUM_ENEMIES];
 	struct timeval start_time;
@@ -135,9 +135,9 @@ int main(void)
 			usleep(DELAY_USEC - res.tv_usec);
 
 		/* make enemies faster every 10 sec */
-		if (state.speed > 0 && now.tv_sec > last_time.tv_sec &&
+		if (state.slowness > 0 && now.tv_sec > last_time.tv_sec &&
 		    ((now.tv_sec - state.start_time.tv_sec) % 10) == 0)
-			state.speed--;
+			state.slowness--;
 
 		last_time = now;
 
@@ -209,7 +209,7 @@ static void init_state(struct state *state)
 	state->x = COLS / 2;
 	state->y = LINES - 2;
 	state->steps = 0;
-	state->speed = 5;
+	state->slowness = 5;
 	state->use_colors = (has_colors() && (start_color() != ERR));
 	if (state->use_colors) {
 		for (i = 0; i < sizeof(colors); i++)
@@ -299,7 +299,7 @@ static void advance_enemies(struct state *state)
 {
 	int i;
 
-	if (state->steps < state->speed) {
+	if (state->steps < state->slowness) {
 		state->steps++;
 	} else {
 		state->steps = 0;
