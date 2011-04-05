@@ -75,6 +75,7 @@ static void wait_for_key(int key);
 int main(void)
 {
 	struct state state;
+	struct timeval start = {0L, 0L};
 	struct timeval last_time = {0L, 0L};
 	struct timeval now = {0L, 0L};
 	struct timeval res = {0L, 0L};
@@ -96,7 +97,8 @@ int main(void)
 	new_enemies(&state, TRUE);
 	advance_game(&state);
 
-	(void)gettimeofday(&last_time, NULL);
+	(void)gettimeofday(&start, NULL);
+	last_time = start;
 	srandom(last_time.tv_sec);
 
 	while (!state.done) {
@@ -109,6 +111,11 @@ int main(void)
 
 		if (res.tv_sec == 0 && res.tv_usec < DELAY_USEC)
 			usleep(DELAY_USEC - res.tv_usec);
+
+		/* make enemies faster every 10 sec */
+		if (state.speed > 0 && now.tv_sec > last_time.tv_sec &&
+		    ((now.tv_sec - start.tv_sec) % 10) == 0)
+			state.speed--;
 
 		last_time = now;
 
