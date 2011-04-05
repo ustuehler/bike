@@ -23,7 +23,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#define VERSION		"1.1"
+#define VERSION		"1.2"
 #define NUM_ENEMIES	400
 #define MAX_HITS	5
 #define PATH_WIDTH	30
