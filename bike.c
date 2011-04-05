@@ -46,7 +46,6 @@ struct state {
 	int done;
 	int x;
 	int y;
-	int bike;
 	int steps;
 	int speed;
 	int hits;
@@ -184,7 +183,6 @@ static void init_state(struct state *state)
 	memset(state, 0, sizeof(struct state));
 	state->x = COLS / 2;
 	state->y = LINES - 2;
-	state->bike = BIKE_CHAR;
 	state->steps = 0;
 	state->speed = 5;
 	(void)gettimeofday(&state->start_time, NULL);
@@ -312,7 +310,7 @@ static void draw_enemy(struct enemy *enemy)
 
 static void draw_bike(struct state *state)
 {
-	mvaddch(state->y, state->x, state->bike);
+	mvaddch(state->y, state->x, BIKE_CHAR);
 }
 
 static void draw_status_bar(struct state* state)
