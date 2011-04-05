@@ -264,6 +264,7 @@ static void advance_game(struct bike *bike)
 static void detect_collisions(struct bike *bike)
 {
 	int i;
+
 	for (i = 0; i < NUM_ENEMIES; i++) {
 		struct enemy *enemy = &enemies[i];
 		if (enemy->used && enemy->x == bike->x && enemy->y == bike->y) {
@@ -279,8 +280,8 @@ static void message(int y, int x, const char *fmt, ...)
 {
 	char msg[1000];
 	va_list ap;
-	memset(msg, 0, sizeof(msg));
 
+	memset(msg, 0, sizeof(msg));
 	move(y, x);
 	va_start(ap, fmt);
 	vsnprintf(msg, sizeof(msg), fmt, ap);
@@ -291,6 +292,7 @@ static void message(int y, int x, const char *fmt, ...)
 static void draw_enemies(void)
 {
 	int i;
+
 	for (i = 0; i < NUM_ENEMIES; i++) {
 		struct enemy *enemy = &enemies[i];
 		if (enemy->used) {
