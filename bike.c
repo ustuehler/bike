@@ -52,6 +52,7 @@ static int steps;
 static int slowness;
 static struct enemy enemies[NUM_ENEMIES];
 static struct timeval start_time;
+static struct timeval flawless_until;
 static bool use_colors;
 
 #define COLOR_DEFAULT	0
@@ -181,11 +182,14 @@ static void title_screen(void)
 static void game_over(void)
 {
 	struct timeval now = {0L, 0L};
-	struct timeval res = {0L, 0L};
+	struct timeval total = {0L, 0L};
+	struct timeval flawless = {0L, 0L};
 
 	(void)gettimeofday(&now, NULL);
-	timersub(&now, &start_time, &res);
-	printf("GAME OVER -- You lasted %lu seconds.\n", res.tv_sec);
+	timersub(&now, &start_time, &total);
+	timersub(&flawless_until, &start_time, &flawless);
+	printf("GAME OVER -- You lasted %lu seconds.\n", total.tv_sec);
+	printf("Flawless (no hits) for %lu seconds!\n", flawless.tv_sec);
 }
 
 static void wait_for_key(int key)
@@ -263,6 +267,8 @@ static void detect_collisions(struct bike *bike)
 	for (i = 0; i < NUM_ENEMIES; i++) {
 		struct enemy *enemy = &enemies[i];
 		if (enemy->used && enemy->x == bike->x && enemy->y == bike->y) {
+			if (bike->hits == 0)
+				(void)gettimeofday(&flawless_until, NULL);
 			bike->hits++;
 			enemy->used = FALSE;
 		}
