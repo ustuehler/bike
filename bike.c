@@ -302,27 +302,27 @@ static void advance_enemies(void)
 	}
 }
 
-static void new_enemies(bool init)
+static void new_enemies(bool new_game)
 {
 	int i;
 
 	for (i = 0; i < NUM_ENEMIES; i++) {
 		struct enemy *enemy = &enemies[i];
 		if ((!enemy->used) && ((random() % 103) == 0)) {
-			init_enemy(init, enemy);
-			if (!init)
+			init_enemy(new_game, enemy);
+			if (!new_game)
 				break;
 		}
 	}
 }
 
-static void init_enemy(bool init, struct enemy *enemy)
+static void init_enemy(bool new_game, struct enemy *enemy)
 {
 	static char *enemy_chars = "o#*";
 
 	enemy->used = TRUE;
 	enemy->x = (random() % (PATH_WIDTH - 1)) + SIDE_EDGE + 1;
-	if (init)
+	if (new_game)
 		enemy->y = (random() % (PATH_LENGTH / 2)) + TOP_EDGE;
 	else
 		enemy->y = TOP_EDGE;
