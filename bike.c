@@ -74,21 +74,21 @@ struct colors {
 
 static void title_screen(void);
 static void game_over(void);
-static void init_enemy(bool init, struct enemy *enemy);
-static void draw_enemy(struct enemy *enemy);
+static void init_enemy(bool, struct enemy *);
+static void draw_enemy(struct enemy *);
 static void get_input(void);
 static void advance_game(void);
 static void detect_collisions(void);
 static void init_state(void);
 static void draw_enemies(void);
-static void new_enemies(bool init);
+static void new_enemies(bool);
 static void advance_enemies(void);
 static void draw_bike(void);
 static void draw_status_bar(void);
 static void draw_path(void);
 static void cleanup(void);
-static void message(int y, int x, const char *fmt, ...);
-static void wait_for_key(int key);
+static void message(int, int, const char *, ...);
+static void wait_for_key(int);
 
 int main(void)
 {
