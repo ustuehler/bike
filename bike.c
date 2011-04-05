@@ -38,9 +38,8 @@ struct enemy {
 	int c;
 	int x;
 	int y;
+	short color;
 };
-
-static char *enemy_chars = "o#*";
 
 struct state {
 	int done;
@@ -51,12 +50,34 @@ struct state {
 	int hits;
 	struct enemy enemies[NUM_ENEMIES];
 	struct timeval start_time;
+	bool use_colors;
+};
+
+#define COLOR_DEFAULT	0
+#define COLOR_BIKE	1
+#define COLOR_ENEMY_1	2
+#define COLOR_ENEMY_2	3
+#define COLOR_ENEMY_3	4
+#define COLOR_STATUS	5
+#define COLOR_PATH	6
+
+struct colors {
+	short x;
+	short fg;
+	short bg;
+} colors[] = {
+	{COLOR_BIKE,	COLOR_WHITE,	COLOR_BLACK},
+	{COLOR_ENEMY_1,	COLOR_YELLOW,	COLOR_BLACK},
+	{COLOR_ENEMY_2,	COLOR_RED,	COLOR_BLACK},
+	{COLOR_ENEMY_3,	COLOR_GREEN,	COLOR_BLACK},
+	{COLOR_STATUS,	COLOR_WHITE,	COLOR_BLUE},
+	{COLOR_PATH,	COLOR_MAGENTA,	COLOR_BLACK}
 };
 
 static void title_screen(void);
 static void game_over(struct state *state);
-static void init_enemy(struct enemy *enemy, bool init);
-static void draw_enemy(struct enemy *enemy);
+static void init_enemy(struct state * state, bool init, struct enemy *enemy);
+static void draw_enemy(struct state * state, struct enemy *enemy);
 static void get_input(struct state *state);
 static void advance_game(struct state *state);
 static void detect_collisions(struct state *state);
@@ -66,7 +87,7 @@ static void new_enemies(struct state *state, bool init);
 static void advance_enemies(struct state *state);
 static void draw_bike(struct state *state);
 static void draw_status_bar(struct state *state);
-static void draw_path(void);
+static void draw_path(struct state *state);
 static void cleanup(void);
 static void message(int y, int x, const char *fmt, ...);
 static void wait_for_key(int key);
@@ -178,11 +199,19 @@ static void wait_for_key(int key)
 
 static void init_state(struct state *state)
 {
+	int i;
+
 	memset(state, 0, sizeof(struct state));
 	state->x = COLS / 2;
 	state->y = LINES - 2;
 	state->steps = 0;
 	state->speed = 5;
+	state->use_colors = (has_colors() && (start_color() != ERR));
+	if (state->use_colors) {
+		color_set(COLOR_DEFAULT, NULL);
+		for (i = 0; i < sizeof(colors); i++)
+			init_pair(colors[i].x, colors[i].fg, colors[i].bg);
+	}
 	(void)gettimeofday(&state->start_time, NULL);
 }
 
@@ -210,10 +239,10 @@ static void get_input(struct state* state)
 	}
 }
 
-static void advance_game(struct state* state)
+static void advance_game(struct state *state)
 {
 	erase();
-	draw_path();
+	draw_path(state);
 	new_enemies(state, FALSE);
 	advance_enemies(state);
 	draw_enemies(state);
@@ -256,7 +285,7 @@ static void draw_enemies(struct state *state)
 	for (i = 0; i < NUM_ENEMIES; i++) {
 		struct enemy *enemy = &state->enemies[i];
 		if (enemy->used) {
-			draw_enemy(enemy);
+			draw_enemy(state, enemy);
 			if (enemy->y > LINES - 1)
 				enemy->used = FALSE;
 		}
@@ -283,15 +312,17 @@ static void new_enemies(struct state *state, bool init)
 	for (i = 0; i < NUM_ENEMIES; i++) {
 		struct enemy *enemy = &state->enemies[i];
 		if ((!enemy->used) && ((random() % 103) == 0)) {
-			init_enemy(enemy, init);
+			init_enemy(state, init, enemy);
 			if (!init)
 				break;
 		}
 	}
 }
 
-static void init_enemy(struct enemy *enemy, bool init)
+static void init_enemy(struct state *state, bool init, struct enemy *enemy)
 {
+	static char *enemy_chars = "o#*";
+
 	enemy->used = TRUE;
 	enemy->x = (random() % (PATH_WIDTH - 1)) + SIDE_EDGE + 1;
 	if (init)
@@ -299,26 +330,56 @@ static void init_enemy(struct enemy *enemy, bool init)
 	else
 		enemy->y = TOP_EDGE;
 	enemy->c = enemy_chars[random() % (strlen(enemy_chars))];
+	if (state->use_colors) {
+		switch (enemy->c) {
+			case 'o':
+				enemy->color = COLOR_ENEMY_1;
+				break;
+			case '#':
+				enemy->color = COLOR_ENEMY_2;
+				break;
+			case '*':
+				enemy->color = COLOR_ENEMY_3;
+				break;
+			default:
+				abort();
+		}
+	}
 }
 
-static void draw_enemy(struct enemy *enemy)
+static void draw_enemy(struct state *state, struct enemy *enemy)
 {
+	if (state->use_colors)
+		color_set(enemy->color, NULL);
 	mvaddch(enemy->y, enemy->x, enemy->c);
+	if (state->use_colors)
+		color_set(COLOR_DEFAULT, NULL);
 }
 
 static void draw_bike(struct state *state)
 {
+	if (state->use_colors)
+		color_set(COLOR_BIKE, NULL);
 	mvaddch(state->y, state->x, BIKE_CHAR);
+	if (state->use_colors)
+		color_set(COLOR_DEFAULT, NULL);
 }
 
 static void draw_status_bar(struct state* state)
 {
 	int i;
-	attron(A_STANDOUT);
+
+	if (state->use_colors)
+		color_set(COLOR_STATUS, NULL);
+	else
+		attron(A_STANDOUT);
 	for (i = 0; i < (MAX_HITS - state->hits); i++) 
 		message(LINES - 3 - (i << 1), 3, "%c", BIKE_CHAR);
 	message(LINES - 1, 0, "Pos: %.2i - Hits: %i", state->x, state->hits);
-	attroff(A_STANDOUT);
+	if (state->use_colors)
+		color_set(COLOR_DEFAULT, NULL);
+	else
+		attroff(A_STANDOUT);
 }
 
 static void cleanup(void)
@@ -328,11 +389,16 @@ static void cleanup(void)
 	curs_set(1);
 }
 
-static void draw_path()
+static void draw_path(struct state *state)
 {
 	int line;
+
+	if (state->use_colors)
+		color_set(COLOR_PATH, NULL);
 	for (line = TOP_EDGE; line < LINES - 1; line++) {
 		mvaddch(line, SIDE_EDGE, '|');
 		mvaddch(line, COLS - SIDE_EDGE, '|');
 	}
+	if (state->use_colors)
+		color_set(COLOR_DEFAULT, NULL);
 }
