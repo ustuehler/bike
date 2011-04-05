@@ -24,13 +24,13 @@
 #include <sys/time.h>
 
 #define VERSION		"1.1"
-#define NUM_ENEMIES	400	/* number of enemies. */
-#define MAX_HITS	5	/* game is over when MAX_HITS is reached */
-#define PATH_WIDTH	30	/* width of bike path */
-#define PATH_LENGTH	25	/* length of bike path */
+#define NUM_ENEMIES	400
+#define MAX_HITS	5
+#define PATH_WIDTH	30
+#define PATH_LENGTH	25
 #define SIDE_EDGE	((COLS - PATH_WIDTH) / 2)
 #define TOP_EDGE	(LINES - PATH_LENGTH)
-#define BIKE_CHAR	'8'	/* the char the represents the bike */
+#define BIKE_CHAR	'8'
 #define DELAY_USEC	50000L
 
 struct enemy {
