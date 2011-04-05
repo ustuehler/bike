@@ -113,6 +113,10 @@ int main(void)
 	title_screen();
 
 	init_state(&state);
+	if (state.use_colors) {
+		color_set(COLOR_DEFAULT, NULL);
+		clear();
+	}
 	new_enemies(&state, TRUE);
 	advance_game(&state);
 
@@ -208,7 +212,6 @@ static void init_state(struct state *state)
 	state->speed = 5;
 	state->use_colors = (has_colors() && (start_color() != ERR));
 	if (state->use_colors) {
-		color_set(COLOR_DEFAULT, NULL);
 		for (i = 0; i < sizeof(colors); i++)
 			init_pair(colors[i].x, colors[i].fg, colors[i].bg);
 	}
