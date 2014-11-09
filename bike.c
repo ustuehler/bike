@@ -187,8 +187,8 @@ static void game_over(void)
 	(void)gettimeofday(&now, NULL);
 	timersub(&now, &start_time, &total);
 	timersub(&flawless_until, &start_time, &flawless);
-	printf("GAME OVER -- You lasted %lu seconds.\n", total.tv_sec);
-	printf("Flawless (no hits) for %lu seconds!\n", flawless.tv_sec);
+	printf("GAME OVER -- You lasted %llu seconds.\n", total.tv_sec);
+	printf("Flawless (no hits) for %llu seconds!\n", flawless.tv_sec);
 }
 
 static void wait_for_key(int key)
