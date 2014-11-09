@@ -123,7 +123,6 @@ int main(void)
 	advance_game(&bike);
 
 	(void)gettimeofday(&last_time, NULL);
-	srandom(last_time.tv_sec);
 
 	while (!done) {
 		(void)gettimeofday(&now, NULL);
@@ -322,7 +321,7 @@ static void new_enemies(bool new_game)
 
 	for (i = 0; i < NUM_ENEMIES; i++) {
 		struct enemy *enemy = &enemies[i];
-		if ((!enemy->used) && ((random() % 103) == 0)) {
+		if ((!enemy->used) && ((arc4random_uniform(103)) == 0)) {
 			init_enemy(new_game, enemy);
 			if (!new_game)
 				break;
@@ -335,12 +334,12 @@ static void init_enemy(bool new_game, struct enemy *enemy)
 	static char *enemy_chars = "o#*";
 
 	enemy->used = TRUE;
-	enemy->x = (random() % (PATH_WIDTH - 1)) + SIDE_EDGE + 1;
+	enemy->x = (arc4random() % (PATH_WIDTH - 1)) + SIDE_EDGE + 1;
 	if (new_game)
-		enemy->y = (random() % (PATH_LENGTH / 2)) + TOP_EDGE;
+		enemy->y = (arc4random_uniform(PATH_LENGTH / 2)) + TOP_EDGE;
 	else
 		enemy->y = TOP_EDGE;
-	enemy->c = enemy_chars[random() % (strlen(enemy_chars))];
+	enemy->c = enemy_chars[arc4random_uniform(strlen(enemy_chars))];
 	if (use_colors) {
 		switch (enemy->c) {
 			case 'o':
