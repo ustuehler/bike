@@ -55,7 +55,7 @@ static struct timeval start_time;
 static struct timeval flawless_until;
 static bool use_colors;
 
-#define COLOR_DEFAULT	0
+#define COLOR_DEFAULT	-1
 #define COLOR_BIKE	1
 #define COLOR_ENEMY_1	2
 #define COLOR_ENEMY_2	3
@@ -68,12 +68,12 @@ struct colors {
 	short fg;
 	short bg;
 } colors[] = {
-	{COLOR_BIKE,	COLOR_WHITE,	COLOR_BLACK},
-	{COLOR_ENEMY_1,	COLOR_YELLOW,	COLOR_BLACK},
-	{COLOR_ENEMY_2,	COLOR_RED,	COLOR_BLACK},
-	{COLOR_ENEMY_3,	COLOR_GREEN,	COLOR_BLACK},
+	{COLOR_BIKE,	COLOR_WHITE,	COLOR_DEFAULT},
+	{COLOR_ENEMY_1,	COLOR_YELLOW,	COLOR_DEFAULT},
+	{COLOR_ENEMY_2,	COLOR_RED,	COLOR_DEFAULT},
+	{COLOR_ENEMY_3,	COLOR_GREEN,	COLOR_DEFAULT},
 	{COLOR_STATUS,	COLOR_WHITE,	COLOR_BLUE},
-	{COLOR_PATH,	COLOR_MAGENTA,	COLOR_BLACK}
+	{COLOR_PATH,	COLOR_MAGENTA,	COLOR_DEFAULT}
 };
 
 static void title_screen(void);
@@ -102,6 +102,7 @@ int main(void)
 	struct timeval res = {0L, 0L};
 
 	(void)initscr();
+	use_default_colors();
 	cbreak();
 	noecho();
 	nonl();
