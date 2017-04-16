@@ -23,6 +23,11 @@
 #include <string.h>
 #include <sys/time.h>
 
+#ifdef __linux__
+#define arc4random_uniform(n) (random() % (n))
+#define arc4random(n) (random())
+#endif
+
 #define VERSION		"1.3"
 #define NUM_ENEMIES	400
 #define MAX_HITS	5
@@ -113,6 +118,9 @@ int main(void)
 	atexit(cleanup);
 	curs_set(0);
 
+#ifdef __linux__
+	srandom(0x557765);
+#endif
 	title_screen();
 
 	init_state(&bike);

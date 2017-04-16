@@ -3,6 +3,7 @@ LDFLAGS=-lcurses
 PREFIX?=/usr/local
 
 bike: bike.c
+	cc ${CFLAGS} $< -o $@ ${LDFLAGS}
 
 .PHONY: clean install
 clean:
