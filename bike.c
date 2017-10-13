@@ -28,7 +28,7 @@
 #define arc4random(n) (random())
 #endif
 
-#define VERSION		"1.3"
+#define VERSION		"1.3 (dirty)"
 #define NUM_ENEMIES	400
 #define MAX_HITS	5
 #define PATH_WIDTH	30
