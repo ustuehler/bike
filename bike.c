@@ -28,7 +28,7 @@
 #define arc4random(n) (random())
 #endif
 
-#define VERSION		"1.3 (dirty)"
+#define VERSION		"1.3"
 #define NUM_ENEMIES	400
 #define MAX_HITS	5
 #define PATH_WIDTH	30
@@ -168,7 +168,7 @@ static void title_screen(void)
 {
 	int line = (((LINES)/2) - 5);
 	erase();
-	message(line, (COLS/2) - 7, " << BIKE %s >>", VERSION);
+	message(line, (COLS/2) - 29, " << BIKE %s (%s) >>", VERSION, BUILD_ID);
 	message(line + 2, (COLS/2) - 24,
 		"Objective: Ride your bike down the hill without");
 	message(line + 3, (COLS/2) - 15,

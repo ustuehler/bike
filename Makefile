@@ -1,4 +1,4 @@
-CFLAGS=-g -Wall
+CFLAGS=-g -Wall -DBUILD_ID=\"`git rev-parse HEAD`\"
 LDFLAGS=-lcurses
 PREFIX?=/usr/local
 
