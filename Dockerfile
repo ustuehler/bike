@@ -1,5 +1,5 @@
 FROM alpine
-RUN apk add --no-cache libc-dev gcc g++ ncurses-dev make openssh tini
+RUN apk add --no-cache libc-dev gcc g++ ncurses-dev make openssh tini git
 COPY . /src
 WORKDIR /src
 RUN make
